@@ -60,7 +60,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Assets will be added here as needed
-  # assets:
-  #   - assets/images/
-  #   - assets/icons/
+  assets:
+    - assets/images/logo/
+    - assets/images/splash/
+    - assets/images/trending/
+    - assets/images/new/
+    - assets/images/future/
