@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/constants/app_constants.dart';
 import '../core/navigation/app_navigator.dart';
 import '../core/navigation/app_route.dart';
+import '../features/splash/presentation/pages/splash_page.dart';
 import 'app_shell.dart';
 import 'di.dart';
 
@@ -48,8 +49,7 @@ class _VogueVibeAppState extends State<VogueVibeApp> {
   Widget _buildCurrentPage() {
     switch (_navigator.currentRoute) {
       case AppRoute.splash:
-        // TODO: Return SplashPage when UI is ready
-        return const _PlaceholderPage(title: 'Splash');
+        return const SplashPage();
 
       case AppRoute.login:
         // TODO: Return LoginPage when UI is ready
