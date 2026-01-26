@@ -1,0 +1,205 @@
+{
+  "baseUrl": "https://mock.clothing.api",
+
+  "authPolicy": {
+    "acceptedEmail": "test@clothingapp.com",
+    "acceptedPassword": "12345678",
+    "staticToken": "mock-jwt-token-123456"
+  },
+
+  "endpoints": {
+
+    "POST /auth/register": {
+      "request": {
+        "name": "Test User",
+        "email": "test@clothingapp.com",
+        "password": "12345678",
+        "phone": "01000000000"
+      },
+      "response": {
+        "token": "mock-jwt-token-123456",
+        "user": {
+          "id": 1,
+          "name": "Test User",
+          "email": "test@clothingapp.com"
+        }
+      }
+    },
+
+    "POST /auth/login": {
+      "request": {
+        "email": "test@clothingapp.com",
+        "password": "12345678"
+      },
+      "response": {
+        "token": "mock-jwt-token-123456",
+        "user": {
+          "id": 1,
+          "name": "Test User",
+          "email": "test@clothingapp.com"
+        }
+      }
+    },
+
+    "GET /auth/profile": {
+      "headers": {
+        "Authorization": "Bearer mock-jwt-token-123456"
+      },
+      "response": {
+        "id": 1,
+        "name": "Test User",
+        "email": "test@clothingapp.com",
+        "phone": "01000000000",
+        "avatar": "https://placehold.co/200",
+        "address": "Cairo, Egypt"
+      }
+    },
+
+    "GET /home": {
+      "response": {
+        "sections": [
+          {
+            "type": "trending",
+            "products": [1, 2]
+          },
+          {
+            "type": "sale",
+            "products": [3]
+          }
+        ]
+      }
+    },
+
+    "GET /categories": {
+      "response": [
+        { "id": 1, "name": "T-Shirts" },
+        { "id": 2, "name": "Hoodies" },
+        { "id": 3, "name": "Jeans" }
+      ]
+    },
+
+    "GET /products": {
+      "response": [
+        {
+          "id": 1,
+          "name": "Oversized T-Shirt",
+          "price": 450,
+          "salePrice": 399,
+          "image": "https://placehold.co/300",
+          "isFavorite": true
+        },
+        {
+          "id": 2,
+          "name": "Basic Hoodie",
+          "price": 650,
+          "salePrice": null,
+          "image": "https://placehold.co/300",
+          "isFavorite": false
+        }
+      ]
+    },
+
+    "GET /products/{id}": {
+      "example": "GET /products/1",
+      "response": {
+        "id": 1,
+        "name": "Oversized T-Shirt",
+        "description": "Premium cotton",
+        "images": ["https://placehold.co/300"],
+        "variants": [
+          {
+            "variantId": 10,
+            "size": "M",
+            "color": "Black",
+            "price": 399,
+            "stock": 10
+          }
+        ],
+        "isFavorite": true
+      }
+    },
+
+    "POST /favorites/toggle": {
+      "headers": {
+        "Authorization": "Bearer mock-jwt-token-123456"
+      },
+      "request": {
+        "productId": 1
+      },
+      "response": {
+        "success": true,
+        "isFavorite": true
+      }
+    },
+
+    "GET /favorites": {
+      "headers": {
+        "Authorization": "Bearer mock-jwt-token-123456"
+      },
+      "response": [
+        {
+          "id": 1,
+          "name": "Oversized T-Shirt",
+          "price": 450,
+          "salePrice": 399,
+          "image": "https://placehold.co/300"
+        }
+      ]
+    },
+
+    "POST /cart/add": {
+      "headers": {
+        "Authorization": "Bearer mock-jwt-token-123456"
+      },
+      "request": {
+        "productId": 1,
+        "variantId": 10,
+        "quantity": 2
+      },
+      "response": {
+        "success": true
+      }
+    },
+
+    "GET /cart": {
+      "headers": {
+        "Authorization": "Bearer mock-jwt-token-123456"
+      },
+      "response": {
+        "items": [
+          {
+            "productName": "Oversized T-Shirt",
+            "size": "M",
+            "color": "Black",
+            "quantity": 2,
+            "price": 798
+          }
+        ],
+        "total": 798
+      }
+    },
+
+    "POST /checkout": {
+      "headers": {
+        "Authorization": "Bearer mock-jwt-token-123456"
+      },
+      "response": {
+        "orderId": 101,
+        "status": "paid"
+      }
+    },
+
+    "GET /orders": {
+      "headers": {
+        "Authorization": "Bearer mock-jwt-token-123456"
+      },
+      "response": [
+        {
+          "id": 101,
+          "total": 798,
+          "status": "delivered"
+        }
+      ]
+    }
+  }
+}
