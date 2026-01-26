@@ -82,20 +82,6 @@ class _LoginPageState extends State<LoginPage> {
                   isPassword: true,
                 ),
 
-                const SizedBox(height: 24),
-
-                // Error Message
-                const Center(
-                  child: Text(
-                    'Sign in error',
-                    style: TextStyle(
-                      color: AppColors.raspberryPlum,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-
                 const SizedBox(height: 32),
 
                 // Sign In Button
