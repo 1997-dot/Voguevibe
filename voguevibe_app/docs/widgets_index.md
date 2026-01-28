@@ -1,0 +1,229 @@
+# Project Widget Index
+
+This file documents all reusable UI widget classes in the VogueVibe app.
+
+---
+
+## Navigation
+
+---
+
+### CustomFlexibleAppBar
+
+**File:** lib/core/widgets/appbar.dart
+**Type:** Widget (PreferredSizeWidget)
+**Description:** Custom app bar with optional title, leading icon, and action image slots. Used as the main top navigation bar throughout the app.
+
+---
+
+### CustomBottomNavBar
+
+**File:** lib/core/widgets/bottom_navigation_bar.dart
+**Type:** StatefulWidget
+**Description:** Responsive bottom navigation bar with 4 tabs (Home, Cart, Favorites, Profile). Handles selection state and notifies parent via callback.
+
+---
+
+## Buttons
+
+---
+
+### AppButton
+
+**File:** lib/core/widgets/app_button.dart
+**Type:** Widget
+**Description:** Reusable elevated button with optional icon, customizable width/height, styled with app theme colors.
+
+---
+
+### PrimaryActionButton
+
+**File:** lib/core/widgets/app_button.dart
+**Type:** Widget
+**Description:** Premium responsive CTA button with rounded aesthetic and responsive sizing (70% screen width). Main call-to-action button across the app.
+
+---
+
+## Inputs
+
+---
+
+### AuthTextField
+
+**File:** lib/features/auth/presentation/widgets/auth_form_field.dart
+**Type:** Widget
+**Description:** Styled text field for authentication forms (Sign In/Sign Up). Supports password masking and responsive width constraints.
+
+---
+
+### AppTextField
+
+**File:** lib/core/widgets/app_text_field.dart
+**Type:** Widget
+**Description:** Reusable styled text field widget for general form inputs.
+
+---
+
+## Containers
+
+---
+
+### GlassContainer
+
+**File:** lib/core/widgets/glass_container.dart
+**Type:** Widget
+**Description:** Reusable glassmorphism container widget for frosted glass UI effects.
+
+---
+
+## Feedback
+
+---
+
+### LoadingIndicator
+
+**File:** lib/core/widgets/loading_indicator.dart
+**Type:** Widget
+**Description:** Reusable loading indicator widget for async operations and loading states.
+
+---
+
+## Home Widgets
+
+---
+
+### SectionHeader
+
+**File:** lib/features/home/presentation/widgets/section_header.dart
+**Type:** Widget
+**Description:** Section header widget for labeling content sections (Trending, Sale, New Arrivals, etc.).
+
+---
+
+### ProductCard
+
+**File:** lib/features/home/presentation/widgets/product_card.dart
+**Type:** Widget
+**Description:** Product card widget for displaying products in the home grid layout.
+
+---
+
+## Category Widgets
+
+---
+
+### CategoryCard
+
+**File:** lib/features/categories/presentation/widgets/category_card.dart
+**Type:** Widget
+**Description:** Category card widget for displaying product categories.
+
+---
+
+## Product Widgets
+
+---
+
+### ProductImageGallery
+
+**File:** lib/features/product/presentation/widgets/product_image_gallery.dart
+**Type:** Widget
+**Description:** Image gallery widget for displaying multiple product images with navigation.
+
+---
+
+### VariantSelector
+
+**File:** lib/features/product/presentation/widgets/variant_selector.dart
+**Type:** Widget
+**Description:** Size/Color variant selector widget for product customization options.
+
+---
+
+### PriceTag
+
+**File:** lib/features/product/presentation/widgets/price_tag.dart
+**Type:** Widget
+**Description:** Price display widget showing original and sale prices.
+
+---
+
+## Cart Widgets
+
+---
+
+### CartItemCard
+
+**File:** lib/features/cart/presentation/widgets/cart_item_card.dart
+**Type:** Widget
+**Description:** Cart item card widget for displaying individual items in the shopping cart.
+
+---
+
+### CartSummary
+
+**File:** lib/features/cart/presentation/widgets/cart_summary.dart
+**Type:** Widget
+**Description:** Cart summary widget displaying totals and checkout button.
+
+---
+
+### QuantitySelector
+
+**File:** lib/features/cart/presentation/widgets/quantity_selector.dart
+**Type:** Widget
+**Description:** Quantity increment/decrement widget for adjusting item quantities.
+
+---
+
+## Favorites Widgets
+
+---
+
+### FavoriteItemCard
+
+**File:** lib/features/favorites/presentation/widgets/favorite_item_card.dart
+**Type:** Widget
+**Description:** Favorite item card widget for displaying saved/wishlisted products.
+
+---
+
+## Checkout Widgets
+
+---
+
+### OrderSummaryCard
+
+**File:** lib/features/checkout/presentation/widgets/order_summary_card.dart
+**Type:** Widget
+**Description:** Order summary display widget showing order details before confirmation.
+
+---
+
+## Profile Widgets
+
+---
+
+### ProfileHeader
+
+**File:** lib/features/profile/presentation/widgets/profile_header.dart
+**Type:** Widget
+**Description:** Profile header widget displaying user avatar, name, and email.
+
+---
+
+### ProfileMenuItem
+
+**File:** lib/features/profile/presentation/widgets/profile_menu_item.dart
+**Type:** Widget
+**Description:** Profile menu item widget for navigation options in the profile screen.
+
+---
+
+### OrderHistoryCard
+
+**File:** lib/features/profile/presentation/widgets/order_history_card.dart
+**Type:** Widget
+**Description:** Order history item card widget for displaying past orders.
+
+---
