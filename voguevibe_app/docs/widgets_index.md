@@ -100,11 +100,35 @@ This file documents all reusable UI widget classes in the VogueVibe app.
 
 ---
 
-### ProductCard
+### ProductCardWidget
 
 **File:** lib/features/home/presentation/widgets/product_card.dart
 **Type:** Widget
-**Description:** Product card widget for displaying products in the home grid layout.
+**Description:** Glassmorphism product card with image, name, price, favorite toggle button, and add-to-cart button. Used for displaying products in home grid.
+
+---
+
+### ProductCategorySection
+
+**File:** lib/features/home/presentation/widgets/category_section.dart
+**Type:** Widget
+**Description:** Section container displaying a category title and a 2-column grid of ProductCardWidgets. Handles favorite and add-to-cart callbacks by index.
+
+---
+
+### ProductCardData
+
+**File:** lib/features/home/presentation/widgets/category_section.dart
+**Type:** Data Model
+**Description:** Data class holding product information (imagePath, tooltip, name, price, isFavorite) for use with ProductCategorySection.
+
+---
+
+### CategorySelector
+
+**File:** lib/features/home/presentation/widgets/category_selector.dart
+**Type:** Widget
+**Description:** Pill-shaped segmented control for switching between product categories (e.g., New, Trending, Future). Animated selection with responsive width.
 
 ---
 
