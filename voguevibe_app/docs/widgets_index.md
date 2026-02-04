@@ -132,6 +132,14 @@ This file documents all reusable UI widget classes in the VogueVibe app.
 
 ---
 
+### PromotionalCard
+
+**File:** lib/features/home/presentation/widgets/offer_widget.dart
+**Type:** Widget
+**Description:** Promotional banner card with background image, gradient overlay, label text, headline, and action button. Used for offers and campaigns on the home page.
+
+---
+
 ## Category Widgets
 
 ---
@@ -176,19 +184,19 @@ This file documents all reusable UI widget classes in the VogueVibe app.
 
 ---
 
-### CartItemCard
+### CartProductCard
 
 **File:** lib/features/cart/presentation/widgets/cart_item_card.dart
 **Type:** Widget
-**Description:** Cart item card widget for displaying individual items in the shopping cart.
+**Description:** Cart item card with product image, name, price, quantity controls (increase/decrease), and remove button. 80% screen width with glassmorphism styling.
 
 ---
 
-### CartSummary
+### CartSummaryBar
 
 **File:** lib/features/cart/presentation/widgets/cart_summary.dart
 **Type:** Widget
-**Description:** Cart summary widget displaying totals and checkout button.
+**Description:** Bottom bar displaying total price and checkout button (AppButton). Glassmorphism styling with upward shadow and rounded top corners.
 
 ---
 
