@@ -224,11 +224,19 @@ This file documents all reusable UI widget classes in the VogueVibe app.
 
 ---
 
-### OrderSummaryCard
+### OrderSummarySection
 
 **File:** lib/features/checkout/presentation/widgets/order_summary_card.dart
 **Type:** Widget
-**Description:** Order summary display widget showing order details before confirmation.
+**Description:** Glassmorphism order summary card showing products list, subtotal, shipping, and total. Used on checkout screen before payment.
+
+---
+
+### ProductModel
+
+**File:** lib/features/checkout/presentation/widgets/order_summary_card.dart
+**Type:** Data Model
+**Description:** Data class for checkout products (image, name, quantity, price) used by OrderSummarySection.
 
 ---
 
