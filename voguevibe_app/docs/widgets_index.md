@@ -212,11 +212,11 @@ This file documents all reusable UI widget classes in the VogueVibe app.
 
 ---
 
-### FavoriteItemCard
+### FavoriteProductHighlightCard
 
 **File:** lib/features/favorites/presentation/widgets/favorite_item_card.dart
 **Type:** Widget
-**Description:** Favorite item card widget for displaying saved/wishlisted products.
+**Description:** Glassmorphism favorite product card with image, name, price, "Add to Cart" button, and filled heart icon to remove from favorites.
 
 ---
 
@@ -237,6 +237,14 @@ This file documents all reusable UI widget classes in the VogueVibe app.
 **File:** lib/features/checkout/presentation/widgets/order_summary_card.dart
 **Type:** Data Model
 **Description:** Data class for checkout products (image, name, quantity, price) used by OrderSummarySection.
+
+---
+
+### PaymentMethodSelector
+
+**File:** lib/features/checkout/presentation/widgets/payment_method.dart
+**Type:** StatefulWidget
+**Description:** Payment method selector with Cash on Delivery and Card options. Card selection reveals animated form for cardholder details (name, card number, expiry, CVV).
 
 ---
 
