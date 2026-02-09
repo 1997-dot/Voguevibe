@@ -180,6 +180,14 @@ This file documents all reusable UI widget classes in the VogueVibe app.
 
 ---
 
+### ProductDetailsBottomSheet
+
+**File:** lib/features/product/presentation/widgets/product_details_screen.dart
+**Type:** Widget
+**Description:** Glassmorphism bottom sheet (70% screen height) showing product image, title, description, specifications list, and two action buttons. Includes close button and scrollable content.
+
+---
+
 ## Cart Widgets
 
 ---
