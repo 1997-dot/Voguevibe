@@ -252,11 +252,11 @@ This file documents all reusable UI widget classes in the VogueVibe app.
 
 ---
 
-### ProfileHeader
+### ProfileHeaderSection
 
 **File:** lib/features/profile/presentation/widgets/profile_header.dart
 **Type:** Widget
-**Description:** Profile header widget displaying user avatar, name, and email.
+**Description:** Profile header card displaying user name, email, and "Edit Profile" button. Uses theme-based colors with shadow.
 
 ---
 
@@ -268,10 +268,34 @@ This file documents all reusable UI widget classes in the VogueVibe app.
 
 ---
 
-### OrderHistoryCard
+### OrderHistorySection
 
 **File:** lib/features/profile/presentation/widgets/order_history_card.dart
 **Type:** Widget
-**Description:** Order history item card widget for displaying past orders.
+**Description:** Order history list section (55% screen height) with title and scrollable order items. Each order shows number, products list, and total price.
+
+---
+
+### OrderHistoryItem
+
+**File:** lib/features/profile/presentation/widgets/order_history_card.dart
+**Type:** Widget
+**Description:** Individual order history item card displaying order number, product list with quantities, and total price.
+
+---
+
+### OrderData
+
+**File:** lib/features/profile/presentation/widgets/order_history_card.dart
+**Type:** Data Model
+**Description:** Data class for order information (orderNumber, products list, totalPrice) used by OrderHistorySection.
+
+---
+
+### OrderProduct
+
+**File:** lib/features/profile/presentation/widgets/order_history_card.dart
+**Type:** Data Model
+**Description:** Data class for order product items (name, quantity) used within OrderData.
 
 ---
