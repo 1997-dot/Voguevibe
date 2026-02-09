@@ -238,6 +238,7 @@ Pattern: Plaid with intersecting multicolor lines*
 Material: Likely cotton or wool-blend fabric
 
 Pattern: Plaid with alternating squares and diagonal lines*
+
 - **Price:*30$*
 
 ---
