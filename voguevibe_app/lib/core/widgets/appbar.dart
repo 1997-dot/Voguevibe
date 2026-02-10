@@ -19,6 +19,7 @@ class CustomFlexibleAppBar extends StatelessWidget implements PreferredSizeWidge
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: height + MediaQuery.of(context).padding.top,
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       decoration: const BoxDecoration(
         color: AppColors.black,

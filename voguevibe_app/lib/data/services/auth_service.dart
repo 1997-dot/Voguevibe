@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import '../models/user_model.dart';
+import 'mock_interceptor.dart';
 
 class AuthService {
   final Dio _dio;
@@ -16,7 +17,9 @@ class AuthService {
               'Accept': 'application/json',
             },
           ),
-        );
+        ) {
+    _dio.interceptors.add(MockInterceptor());
+  }
 
   /// Sign in with email and password
   Future<UserModel> signIn({

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 
-class ProductCardWidget extends StatelessWidget {
+class ProductCardWidget extends StatefulWidget {
   final String imagePath;
   final String imageTooltip;
   final String productName;
@@ -24,6 +24,32 @@ class ProductCardWidget extends StatelessWidget {
     required this.onAddTap,
     this.isAdded = false,
   });
+
+  @override
+  State<ProductCardWidget> createState() => _ProductCardWidgetState();
+}
+
+class _ProductCardWidgetState extends State<ProductCardWidget> {
+  late bool _isFavorite;
+  late bool _isAdded;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFavorite = widget.isFavorite;
+    _isAdded = widget.isAdded;
+  }
+
+  @override
+  void didUpdateWidget(covariant ProductCardWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isFavorite != widget.isFavorite) {
+      _isFavorite = widget.isFavorite;
+    }
+    if (oldWidget.isAdded != widget.isAdded) {
+      _isAdded = widget.isAdded;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,16 +90,6 @@ class ProductCardWidget extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Floating Favorite Icon
-            Positioned(
-              top: spacing,
-              right: spacing,
-              child: _FavoriteButton(
-                isFavorite: isFavorite,
-                onToggle: onFavoriteToggle,
-              ),
-            ),
           ],
         ),
       ),
@@ -82,13 +98,13 @@ class ProductCardWidget extends StatelessWidget {
 
   Widget _buildProductImage(double radius) {
     return Tooltip(
-      message: imageTooltip,
+      message: widget.imageTooltip,
       child: AspectRatio(
         aspectRatio: 1,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(radius - 4),
           child: Image.asset(
-            imagePath,
+            widget.imagePath,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) => Container(
               color: AppColors.carbonBlack,
@@ -102,7 +118,7 @@ class ProductCardWidget extends StatelessWidget {
 
   Widget _buildProductName() {
     return Text(
-      productName,
+      widget.productName,
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
       style: const TextStyle(
@@ -118,53 +134,48 @@ class ProductCardWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          productPrice,
+          widget.productPrice,
           style: const TextStyle(
             color: AppColors.raspberryPlum,
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
         ),
-        InkWell(
-          onTap: onAddTap,
-          borderRadius: BorderRadius.circular(8),
-          child: Icon(
-            Icons.add_circle_outline,
-            color: isAdded ? AppColors.raspberryPlum : AppColors.white,
-            size: 28,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _isFavorite = !_isFavorite;
+                });
+                widget.onFavoriteToggle();
+              },
+              borderRadius: BorderRadius.circular(8),
+              child: Icon(
+                _isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: _isFavorite ? AppColors.raspberryPlum : AppColors.white,
+                size: 28,
+              ),
+            ),
+            const SizedBox(width: 8),
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _isAdded = !_isAdded;
+                });
+                widget.onAddTap();
+              },
+              borderRadius: BorderRadius.circular(8),
+              child: Icon(
+                Icons.add_circle_outline,
+                color: _isAdded ? AppColors.raspberryPlum : AppColors.white,
+                size: 28,
+              ),
+            ),
+          ],
         ),
       ],
-    );
-  }
-}
-
-class _FavoriteButton extends StatelessWidget {
-  final bool isFavorite;
-  final VoidCallback onToggle;
-
-  const _FavoriteButton({required this.isFavorite, required this.onToggle});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onToggle,
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: isFavorite ? AppColors.raspberryPlum : Colors.transparent,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: AppColors.raspberryPlum,
-            width: 2,
-          ),
-        ),
-        child: Icon(
-          isFavorite ? Icons.favorite : Icons.favorite_border,
-          size: 18,
-          color: isFavorite ? AppColors.white : AppColors.raspberryPlum,
-        ),
-      ),
     );
   }
 }

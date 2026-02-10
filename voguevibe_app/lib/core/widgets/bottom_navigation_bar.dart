@@ -71,7 +71,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
         child: SafeArea(
           top: false,
           child: Padding(
-            padding: EdgeInsets.fromLTRB(16, 12, 16, bottomPadding > 0 ? 0 : 12),
+            padding: EdgeInsets.fromLTRB(16, 8, 16, bottomPadding > 0 ? 0 : 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -104,9 +104,9 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
             Icon(
               icon,
               color: iconColor,
-              size: 28,
+              size: 26,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               label,
               style: TextStyle(
