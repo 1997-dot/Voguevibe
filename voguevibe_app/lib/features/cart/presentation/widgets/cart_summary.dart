@@ -4,11 +4,13 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_button.dart';
 
 class CartSummaryBar extends StatelessWidget {
+  final String subtotalText;
   final String totalPriceText;
   final VoidCallback onCheckoutTap;
 
   const CartSummaryBar({
     super.key,
+    required this.subtotalText,
     required this.totalPriceText,
     required this.onCheckoutTap,
   });
@@ -45,16 +47,74 @@ class CartSummaryBar extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 1. TOTAL SECTION
+            // 1. SUBTOTAL ROW
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Subtotal",
+                  style: TextStyle(
+                    color: AppColors.alabasterGrey,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  subtotalText,
+                  style: const TextStyle(
+                    color: AppColors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            // 2. SHIPPING ROW
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Shipping",
+                  style: TextStyle(
+                    color: AppColors.alabasterGrey,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  "Free",
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            // 3. DIVIDER
+            Divider(
+              color: AppColors.alabasterGrey.withValues(alpha: 0.3),
+              thickness: 1,
+            ),
+
+            const SizedBox(height: 10),
+
+            // 4. TOTAL ROW
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
                   "Total",
                   style: TextStyle(
-                    color: AppColors.alabasterGrey,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    color: AppColors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
@@ -70,7 +130,7 @@ class CartSummaryBar extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 2. CHECKOUT BUTTON
+            // 5. CHECKOUT BUTTON
             AppButton(
               text: "Checkout",
               icon: Icons.arrow_forward_rounded,

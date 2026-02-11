@@ -4,14 +4,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/appbar.dart';
 import '../../../../core/widgets/bottom_navigation_bar.dart';
+import '../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../auth/presentation/cubit/auth_state.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../../../cart/presentation/cubit/cart_state.dart';
+import '../../../cart/presentation/pages/cart_page.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 import '../widgets/category_selector.dart';
-import '../widgets/offer_widget.dart';
 import '../widgets/product_card.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,16 +25,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedCategoryIndex = 0;
+  int _navResetKey = 0;
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // Load products when page initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Set user on cubits so cart/favorites operations work
+      final authState = context.read<AuthCubit>().state;
+      if (authState is AuthAuthenticated) {
+        final userId = authState.user.id;
+        context.read<CartCubit>().setUser(userId);
+        context.read<FavoritesCubit>().setUser(userId);
+      }
       context.read<HomeCubit>().loadProducts();
-      context.read<CartCubit>().loadCart();
-      context.read<FavoritesCubit>().loadFavorites();
     });
   }
 
@@ -83,9 +90,19 @@ class _HomePageState extends State<HomePage> {
 
           // Fixed Bottom Navigation Bar
           CustomBottomNavBar(
+            key: ValueKey(_navResetKey),
             initialIndex: 0,
             onItemSelected: (index) {
-              // Handle navigation
+              if (index == 1) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CartPage()),
+                ).then((_) {
+                  setState(() {
+                    _navResetKey++;
+                  });
+                });
+              }
             },
           ),
         ],
@@ -152,36 +169,8 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 24),
 
-            // Future Vision Section
-            _buildSectionTitle('Future Vision'),
-            const SizedBox(height: 16),
-            _buildProductGrid(state, 'Future', 5),
-            const SizedBox(height: 24),
-
-            // Promotional Card
-            Center(
-              child: PromotionalCard(
-                imageName: 'offer/offer.jpg',
-                smallText: 'Enjoy Your Style',
-                mainText: 'Anything 30\$',
-                buttonText: 'Shop Now',
-                onButtonTap: () {
-                  // Handle shop now action
-                },
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // New Drops Section
-            _buildSectionTitle('New Drops'),
-            const SizedBox(height: 16),
-            _buildProductGrid(state, 'New', 5),
-            const SizedBox(height: 24),
-
-            // Trending Now Section
-            _buildSectionTitle('Trending Now'),
-            const SizedBox(height: 16),
-            _buildProductGrid(state, 'Trending', 7),
+            // Show products for the selected category
+            _buildCategorySection(state),
             const SizedBox(height: 24),
           ],
         ),
@@ -223,55 +212,66 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color: AppColors.white,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
+  // Maps selected index to category key and display title
+  static const _categories = [
+    {'key': 'Future', 'title': 'Future Vision'},
+    {'key': 'New', 'title': 'New Drops'},
+    {'key': 'Trending', 'title': 'Trending Now'},
+  ];
 
-  Widget _buildProductGrid(HomeLoaded state, String category, int itemCount) {
-    final products = state.getProductsByCategory(category).take(itemCount).toList();
+  Widget _buildCategorySection(HomeLoaded state) {
+    final category = _categories[_selectedCategoryIndex];
+    final products = state.getProductsByCategory(category['key']!).toList();
 
-    return BlocBuilder<FavoritesCubit, FavoritesState>(
-      builder: (context, favoritesState) {
-        return BlocBuilder<CartCubit, CartState>(
-          builder: (context, cartState) {
-            return GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.65,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-              ),
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final product = products[index];
-                return ProductCardWidget(
-                  imagePath: product.thumbnail,
-                  imageTooltip: product.title,
-                  productName: product.title,
-                  productPrice: '\$${product.price.toStringAsFixed(0)}',
-                  isFavorite: product.isFavorite,
-                  isAdded: product.isInCart,
-                  onFavoriteToggle: () {
-                    context.read<FavoritesCubit>().toggleFavorite(product.id);
-                  },
-                  onAddTap: () {
-                    context.read<CartCubit>().addToCart(product.id);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          category['title']!,
+          style: const TextStyle(
+            color: AppColors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 16),
+        BlocBuilder<FavoritesCubit, FavoritesState>(
+          builder: (context, favoritesState) {
+            return BlocBuilder<CartCubit, CartState>(
+              builder: (context, cartState) {
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.65,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return ProductCardWidget(
+                      imagePath: product.thumbnail,
+                      imageTooltip: product.title,
+                      productName: product.title,
+                      productPrice: '\$${product.price.toStringAsFixed(0)}',
+                      isFavorite: product.isFavorite,
+                      isAdded: product.isInCart,
+                      onFavoriteToggle: () {
+                        context.read<FavoritesCubit>().toggleFavorite(product.id);
+                      },
+                      onAddTap: () {
+                        context.read<CartCubit>().addToCart(product.id);
+                      },
+                    );
                   },
                 );
               },
             );
           },
-        );
-      },
+        ),
+      ],
     );
   }
 }
