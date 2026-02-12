@@ -21,8 +21,8 @@ class CategorySelector extends StatelessWidget {
 
     return Center(
       child: Container(
-        // Constrain width to 85% of the screen
-        width: screenWidth * 0.85,
+        // Constrain width to 90% of the screen
+        width: screenWidth * 0.90,
         height: 50, // Standard height for touch targets
         decoration: BoxDecoration(
           color: AppColors.blackberryCream,

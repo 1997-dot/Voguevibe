@@ -9,11 +9,13 @@ import '../../../auth/presentation/cubit/auth_state.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../../../cart/presentation/cubit/cart_state.dart';
 import '../../../cart/presentation/pages/cart_page.dart';
+import '../../../checkout/presentation/cubit/checkout_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 import '../widgets/category_selector.dart';
+import '../widgets/offer_widget.dart';
 import '../widgets/product_card.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,7 +26,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedCategoryIndex = 0;
+  int _selectedCategoryIndex = -1;
   int _navResetKey = 0;
   final TextEditingController _searchController = TextEditingController();
 
@@ -38,6 +40,7 @@ class _HomePageState extends State<HomePage> {
         final userId = authState.user.id;
         context.read<CartCubit>().setUser(userId);
         context.read<FavoritesCubit>().setUser(userId);
+        context.read<CheckoutCubit>().setUser(userId);
       }
       context.read<HomeCubit>().loadProducts();
     });
@@ -163,14 +166,18 @@ class _HomePageState extends State<HomePage> {
               selectedIndex: _selectedCategoryIndex,
               onChanged: (index) {
                 setState(() {
-                  _selectedCategoryIndex = index;
+                  _selectedCategoryIndex =
+                      _selectedCategoryIndex == index ? -1 : index;
                 });
               },
             ),
             const SizedBox(height: 24),
 
-            // Show products for the selected category
-            _buildCategorySection(state),
+            // Show all sections or filtered by selected category
+            if (_selectedCategoryIndex == -1)
+              _buildAllSections(state)
+            else
+              _buildCategorySection(state),
             const SizedBox(height: 24),
           ],
         ),
@@ -184,10 +191,10 @@ class _HomePageState extends State<HomePage> {
         width: MediaQuery.of(context).size.width * 0.8,
         height: 50,
         decoration: BoxDecoration(
-          color: AppColors.blackberryCream,
+          color: AppColors.carbonBlack,
           borderRadius: BorderRadius.circular(25),
           border: Border.all(
-            color: AppColors.carbonBlack,
+            color: AppColors.blackberryCream,
             width: 1.5,
           ),
         ),
@@ -196,7 +203,7 @@ class _HomePageState extends State<HomePage> {
           style: const TextStyle(color: AppColors.alabasterGrey),
           decoration: const InputDecoration(
             hintText: 'Search products...',
-            hintStyle: TextStyle(color: AppColors.alabasterGrey),
+            hintStyle: TextStyle(color: AppColors.alabasterGrey, fontSize: 13),
             prefixIcon: Icon(
               Icons.search,
               color: AppColors.alabasterGrey,
@@ -218,6 +225,94 @@ class _HomePageState extends State<HomePage> {
     {'key': 'New', 'title': 'New Drops'},
     {'key': 'Trending', 'title': 'Trending Now'},
   ];
+
+  Widget _buildAllSections(HomeLoaded state) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Future Vision Section
+        _buildSectionTitle('Future Vision'),
+        const SizedBox(height: 16),
+        _buildProductGrid(state, 'Future', 5),
+        const SizedBox(height: 24),
+
+        // Promotional Card
+        Center(
+          child: PromotionalCard(
+            imageName: 'offer/offer.jpg',
+            smallText: 'Enjoy Your Style',
+            mainText: 'Anything 30\$',
+            buttonText: 'Shop Now',
+            onButtonTap: () {},
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        // New Drops Section
+        _buildSectionTitle('New Drops'),
+        const SizedBox(height: 16),
+        _buildProductGrid(state, 'New', 5),
+        const SizedBox(height: 24),
+
+        // Trending Now Section
+        _buildSectionTitle('Trending Now'),
+        const SizedBox(height: 16),
+        _buildProductGrid(state, 'Trending', 7),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: AppColors.white,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Widget _buildProductGrid(HomeLoaded state, String category, int itemCount) {
+    final products = state.getProductsByCategory(category).take(itemCount).toList();
+
+    return BlocBuilder<FavoritesCubit, FavoritesState>(
+      builder: (context, favoritesState) {
+        return BlocBuilder<CartCubit, CartState>(
+          builder: (context, cartState) {
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.65,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              itemCount: products.length,
+              itemBuilder: (context, index) {
+                final product = products[index];
+                return ProductCardWidget(
+                  imagePath: product.thumbnail,
+                  imageTooltip: product.title,
+                  productName: product.title,
+                  productPrice: '\$${product.price.toStringAsFixed(0)}',
+                  isFavorite: product.isFavorite,
+                  isAdded: product.isInCart,
+                  onFavoriteToggle: () {
+                    context.read<FavoritesCubit>().toggleFavorite(product.id);
+                  },
+                  onAddTap: () {
+                    context.read<CartCubit>().addToCart(product.id);
+                  },
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
 
   Widget _buildCategorySection(HomeLoaded state) {
     final category = _categories[_selectedCategoryIndex];

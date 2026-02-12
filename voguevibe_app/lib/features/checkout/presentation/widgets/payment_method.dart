@@ -7,7 +7,9 @@ import '../../../../core/theme/app_colors.dart';
 enum PaymentMethod { cashOnDelivery, card }
 
 class PaymentMethodSelector extends StatefulWidget {
-  const PaymentMethodSelector({super.key});
+  final ValueChanged<PaymentMethod>? onMethodChanged;
+
+  const PaymentMethodSelector({super.key, this.onMethodChanged});
 
   @override
   State<PaymentMethodSelector> createState() => _PaymentMethodSelectorState();
@@ -35,6 +37,7 @@ class _PaymentMethodSelectorState extends State<PaymentMethodSelector> {
     setState(() {
       _selectedMethod = method;
     });
+    widget.onMethodChanged?.call(method);
   }
 
   @override

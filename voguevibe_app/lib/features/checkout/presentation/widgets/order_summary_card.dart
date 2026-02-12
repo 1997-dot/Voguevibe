@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 
-class ProductModel {
+class OrderProduct {
   final String image;
   final String name;
   final int quantity;
   final double price;
 
-  const ProductModel({
+  const OrderProduct({
     required this.image,
     required this.name,
     required this.quantity,
@@ -18,7 +18,7 @@ class ProductModel {
 }
 
 class OrderSummarySection extends StatelessWidget {
-  final List<ProductModel> products;
+  final List<OrderProduct> products;
   final double subtotal;
   final String shippingText;
   final double total;
@@ -75,7 +75,7 @@ class OrderSummarySection extends StatelessWidget {
               // PART 2: PRICE SUMMARY SECTION
               _buildSummaryRow("Subtotal", "\$${subtotal.toStringAsFixed(2)}", AppColors.white),
               const SizedBox(height: 12),
-              _buildSummaryRow("Shipping", shippingText, AppColors.royalPlum, isBoldValue: true),
+              _buildSummaryRow("Shipping", shippingText, Colors.green, isBoldValue: true),
 
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
@@ -96,7 +96,7 @@ class OrderSummarySection extends StatelessWidget {
     );
   }
 
-  Widget _buildProductRow(ProductModel product) {
+  Widget _buildProductRow(OrderProduct product) {
     return Row(
       children: [
         // Product Image

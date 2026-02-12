@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/appbar.dart';
+import '../../../checkout/presentation/pages/checkout_page.dart';
 import '../cubit/cart_cubit.dart';
 import '../cubit/cart_state.dart';
 import '../widgets/cart_item_card.dart';
@@ -128,7 +129,10 @@ class _CartPageState extends State<CartPage> {
                   subtotalText: totalText,
                   totalPriceText: totalText,
                   onCheckoutTap: () {
-                    // Handle checkout
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const CheckoutPage()),
+                    );
                   },
                 );
               }
