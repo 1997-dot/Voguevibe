@@ -12,6 +12,8 @@ import '../../../cart/presentation/pages/cart_page.dart';
 import '../../../checkout/presentation/cubit/checkout_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
+import '../../../favorites/presentation/pages/favorites_page.dart';
+import '../../../profile/presentation/pages/profile_page.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 import '../widgets/category_selector.dart';
@@ -105,6 +107,24 @@ class _HomePageState extends State<HomePage> {
                     _navResetKey++;
                   });
                 });
+              } else if (index == 2) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const FavoritesPage()),
+                ).then((_) {
+                  setState(() {
+                    _navResetKey++;
+                  });
+                });
+              } else if (index == 3) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProfilePage()),
+                ).then((_) {
+                  setState(() {
+                    _navResetKey++;
+                  });
+                });
               }
             },
           ),
@@ -191,7 +211,7 @@ class _HomePageState extends State<HomePage> {
         width: MediaQuery.of(context).size.width * 0.8,
         height: 50,
         decoration: BoxDecoration(
-          color: AppColors.carbonBlack,
+          color: AppColors.black,
           borderRadius: BorderRadius.circular(25),
           border: Border.all(
             color: AppColors.blackberryCream,
@@ -203,7 +223,7 @@ class _HomePageState extends State<HomePage> {
           style: const TextStyle(color: AppColors.alabasterGrey),
           decoration: const InputDecoration(
             hintText: 'Search products...',
-            hintStyle: TextStyle(color: AppColors.alabasterGrey, fontSize: 13),
+            hintStyle: TextStyle(color: AppColors.royalPlum, fontSize: 13),
             prefixIcon: Icon(
               Icons.search,
               color: AppColors.alabasterGrey,

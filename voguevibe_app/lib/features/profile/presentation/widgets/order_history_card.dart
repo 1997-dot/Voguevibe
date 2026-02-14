@@ -87,7 +87,7 @@ class OrderHistoryItem extends StatelessWidget {
       decoration: const BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: AppColors.alabasterGrey,
+            color: AppColors.blackberryCream,
             width: 1.0,
           ),
         ),

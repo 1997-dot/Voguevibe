@@ -22,6 +22,10 @@ class ProfileHeaderSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(
+          color: AppColors.blackberryCream,
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
             color: Theme.of(context).shadowColor.withValues(alpha: 0.1),
