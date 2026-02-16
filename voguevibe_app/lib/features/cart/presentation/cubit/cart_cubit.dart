@@ -1,15 +1,25 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../data/repositories/product_repository.dart';
-import '../../../../data/managers/user_data_manager.dart';
+import '../../../../core/utils/result.dart';
+import '../../domain/repositories/cart_repository.dart';
+import '../../domain/usecases/add_to_cart_usecase.dart';
+import '../../domain/usecases/get_cart_usecase.dart';
 import 'cart_state.dart';
 
 class CartCubit extends Cubit<CartState> {
-  final ProductRepository _repository = ProductRepository();
-  final UserDataManager _userDataManager = UserDataManager();
+  final CartFeatureRepository _cartRepository;
+  final GetCartUseCase _getCartUseCase;
+  final AddToCartUseCase _addToCartUseCase;
 
   String? _currentUserId;
 
-  CartCubit() : super(CartInitial());
+  CartCubit({
+    required CartFeatureRepository cartRepository,
+    required GetCartUseCase getCartUseCase,
+    required AddToCartUseCase addToCartUseCase,
+  })  : _cartRepository = cartRepository,
+        _getCartUseCase = getCartUseCase,
+        _addToCartUseCase = addToCartUseCase,
+        super(CartInitial());
 
   /// Set current user and load cart
   Future<void> setUser(String? userId) async {
@@ -30,32 +40,16 @@ class CartCubit extends Cubit<CartState> {
 
     emit(CartLoading());
 
-    try {
-      // Load cart data from storage
-      final cart = await _userDataManager.getUserCart(_currentUserId!);
-
-      // Update product models
-      for (var product in _repository.getAllProducts()) {
-        if (cart.containsKey(product.id)) {
-          product.isInCart = true;
-          product.cartQuantity = cart[product.id]!;
-        } else {
-          product.isInCart = false;
-          product.cartQuantity = 0;
-        }
-      }
-
-      final cartProducts = _repository.getCartProducts();
-      final cartTotal = _repository.getCartTotal();
-      final cartItemsCount = _repository.getCartItemsCount();
-
-      emit(CartLoaded(
-        cartProducts: cartProducts,
-        cartTotal: cartTotal,
-        cartItemsCount: cartItemsCount,
-      ));
-    } catch (e) {
-      emit(CartError('Failed to load cart: ${e.toString()}'));
+    final result = await _getCartUseCase(userId: _currentUserId!);
+    switch (result) {
+      case Success(data: final cart):
+        emit(CartLoaded(
+          cartProducts: cart.items,
+          cartTotal: cart.total,
+          cartItemsCount: cart.itemsCount,
+        ));
+      case Failure(message: final msg):
+        emit(CartError('Failed to load cart: $msg'));
     }
   }
 
@@ -66,22 +60,14 @@ class CartCubit extends Cubit<CartState> {
       return;
     }
 
-    try {
-      _repository.addToCart(productId);
-      final product = _repository.getProductById(productId);
-
-      if (product != null) {
-        await _userDataManager.updateCartQuantity(
-          _currentUserId!,
-          productId,
-          product.cartQuantity,
-        );
-      }
-
-      await loadCart();
-    } catch (e) {
-      emit(CartError('Failed to add to cart: ${e.toString()}'));
-      await loadCart(); // Reload to show current state
+    final result = await _addToCartUseCase(
+        userId: _currentUserId!, productId: productId);
+    switch (result) {
+      case Success():
+        await loadCart();
+      case Failure(message: final msg):
+        emit(CartError('Failed to add to cart: $msg'));
+        await loadCart();
     }
   }
 
@@ -89,13 +75,14 @@ class CartCubit extends Cubit<CartState> {
   Future<void> removeFromCart(String productId) async {
     if (_currentUserId == null) return;
 
-    try {
-      _repository.removeFromCart(productId);
-      await _userDataManager.removeFromCart(_currentUserId!, productId);
-      await loadCart();
-    } catch (e) {
-      emit(CartError('Failed to remove from cart: ${e.toString()}'));
-      await loadCart();
+    final result =
+        await _cartRepository.removeFromCart(_currentUserId!, productId);
+    switch (result) {
+      case Success():
+        await loadCart();
+      case Failure(message: final msg):
+        emit(CartError('Failed to remove from cart: $msg'));
+        await loadCart();
     }
   }
 
@@ -103,17 +90,14 @@ class CartCubit extends Cubit<CartState> {
   Future<void> updateCartQuantity(String productId, int quantity) async {
     if (_currentUserId == null) return;
 
-    try {
-      _repository.updateCartQuantity(productId, quantity);
-      await _userDataManager.updateCartQuantity(
-        _currentUserId!,
-        productId,
-        quantity,
-      );
-      await loadCart();
-    } catch (e) {
-      emit(CartError('Failed to update quantity: ${e.toString()}'));
-      await loadCart();
+    final result = await _cartRepository.updateQuantity(
+        _currentUserId!, productId, quantity);
+    switch (result) {
+      case Success():
+        await loadCart();
+      case Failure(message: final msg):
+        emit(CartError('Failed to update quantity: $msg'));
+        await loadCart();
     }
   }
 
@@ -121,22 +105,14 @@ class CartCubit extends Cubit<CartState> {
   Future<void> incrementQuantity(String productId) async {
     if (_currentUserId == null) return;
 
-    try {
-      _repository.incrementQuantity(productId);
-      final product = _repository.getProductById(productId);
-
-      if (product != null) {
-        await _userDataManager.updateCartQuantity(
-          _currentUserId!,
-          productId,
-          product.cartQuantity,
-        );
-      }
-
-      await loadCart();
-    } catch (e) {
-      emit(CartError('Failed to increment quantity: ${e.toString()}'));
-      await loadCart();
+    final result =
+        await _cartRepository.incrementQuantity(_currentUserId!, productId);
+    switch (result) {
+      case Success():
+        await loadCart();
+      case Failure(message: final msg):
+        emit(CartError('Failed to increment quantity: $msg'));
+        await loadCart();
     }
   }
 
@@ -144,26 +120,14 @@ class CartCubit extends Cubit<CartState> {
   Future<void> decrementQuantity(String productId) async {
     if (_currentUserId == null) return;
 
-    try {
-      _repository.decrementQuantity(productId);
-      final product = _repository.getProductById(productId);
-
-      if (product != null) {
-        if (product.isInCart) {
-          await _userDataManager.updateCartQuantity(
-            _currentUserId!,
-            productId,
-            product.cartQuantity,
-          );
-        } else {
-          await _userDataManager.removeFromCart(_currentUserId!, productId);
-        }
-      }
-
-      await loadCart();
-    } catch (e) {
-      emit(CartError('Failed to decrement quantity: ${e.toString()}'));
-      await loadCart();
+    final result =
+        await _cartRepository.decrementQuantity(_currentUserId!, productId);
+    switch (result) {
+      case Success():
+        await loadCart();
+      case Failure(message: final msg):
+        emit(CartError('Failed to decrement quantity: $msg'));
+        await loadCart();
     }
   }
 
@@ -171,25 +135,25 @@ class CartCubit extends Cubit<CartState> {
   Future<void> clearCart() async {
     if (_currentUserId == null) return;
 
-    try {
-      _repository.clearCart();
-      await _userDataManager.clearCart(_currentUserId!);
-      await loadCart();
-    } catch (e) {
-      emit(CartError('Failed to clear cart: ${e.toString()}'));
-      await loadCart();
+    final result = await _cartRepository.clearCart(_currentUserId!);
+    switch (result) {
+      case Success():
+        await loadCart();
+      case Failure(message: final msg):
+        emit(CartError('Failed to clear cart: $msg'));
+        await loadCart();
     }
   }
 
   /// Check if product is in cart
   bool isInCart(String productId) {
-    final product = _repository.getProductById(productId);
+    final product = _cartRepository.getProductById(productId);
     return product?.isInCart ?? false;
   }
 
   /// Get product cart quantity
   int getCartQuantity(String productId) {
-    final product = _repository.getProductById(productId);
+    final product = _cartRepository.getProductById(productId);
     return product?.cartQuantity ?? 0;
   }
 }

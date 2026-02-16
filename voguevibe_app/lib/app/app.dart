@@ -14,10 +14,23 @@ import '../features/auth/domain/usecases/register_usecase.dart';
 import '../features/auth/presentation/cubit/auth_cubit.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
+import '../features/cart/data/repositories/cart_repository_impl.dart';
+import '../features/cart/data/sources/cart_remote_source.dart';
+import '../features/cart/domain/usecases/add_to_cart_usecase.dart';
+import '../features/cart/domain/usecases/get_cart_usecase.dart';
 import '../features/cart/presentation/cubit/cart_cubit.dart';
 import '../features/checkout/presentation/cubit/checkout_cubit.dart';
 import '../features/favorites/presentation/cubit/favorites_cubit.dart';
+import '../features/home/data/repositories/home_repository_impl.dart';
+import '../features/home/data/sources/home_remote_source.dart';
+import '../features/home/domain/usecases/get_home_data_usecase.dart';
 import '../features/home/presentation/cubit/home_cubit.dart';
+import '../features/product/data/repositories/product_repository_impl.dart';
+import '../features/product/data/sources/product_remote_source.dart';
+import '../features/product/domain/usecases/get_product_detail_usecase.dart';
+import '../features/product/domain/usecases/get_products_usecase.dart';
+import '../features/product/presentation/cubit/product_detail_cubit.dart';
+import '../features/product/presentation/cubit/products_cubit.dart';
 import '../features/splash/presentation/pages/splash_page.dart';
 import 'app_shell.dart';
 import 'di.dart';
@@ -65,8 +78,42 @@ class _VogueVibeAppState extends State<VogueVibeApp> {
             getProfileUseCase: GetProfileUseCase(authRepo),
           );
         }),
-        BlocProvider(create: (_) => HomeCubit()),
-        BlocProvider(create: (_) => CartCubit()),
+        BlocProvider(create: (_) {
+          final homeRepo = HomeRepositoryImpl(
+            dataSource: HomeDataSource(),
+          );
+          return HomeCubit(
+            homeRepository: homeRepo,
+            getHomeDataUseCase: GetHomeDataUseCase(homeRepo),
+          );
+        }),
+        BlocProvider(create: (_) {
+          final productRepo = ProductFeatureRepositoryImpl(
+            dataSource: ProductDataSource(),
+          );
+          return ProductsCubit(
+            getProductsUseCase: GetProductsUseCase(productRepo),
+            productRepository: productRepo,
+          );
+        }),
+        BlocProvider(create: (_) {
+          final productRepo = ProductFeatureRepositoryImpl(
+            dataSource: ProductDataSource(),
+          );
+          return ProductDetailCubit(
+            getProductDetailUseCase: GetProductDetailUseCase(productRepo),
+          );
+        }),
+        BlocProvider(create: (_) {
+          final cartRepo = CartRepositoryImpl(
+            dataSource: CartDataSource(),
+          );
+          return CartCubit(
+            cartRepository: cartRepo,
+            getCartUseCase: GetCartUseCase(cartRepo),
+            addToCartUseCase: AddToCartUseCase(cartRepo),
+          );
+        }),
         BlocProvider(create: (_) => FavoritesCubit()),
         BlocProvider(create: (_) => CheckoutCubit()),
       ],

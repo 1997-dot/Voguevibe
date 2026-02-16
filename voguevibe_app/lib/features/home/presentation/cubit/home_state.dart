@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../../data/models/product_model.dart';
+import '../../domain/entities/home_section.dart';
 
 abstract class HomeState extends Equatable {
   const HomeState();
@@ -16,7 +16,7 @@ class HomeLoading extends HomeState {}
 
 /// Loaded state with products and categories
 class HomeLoaded extends HomeState {
-  final List<ProductModel> allProducts;
+  final List<Product> allProducts;
   final List<String> categories;
 
   const HomeLoaded({
@@ -28,12 +28,12 @@ class HomeLoaded extends HomeState {
   List<Object?> get props => [allProducts, categories];
 
   /// Get products by category
-  List<ProductModel> getProductsByCategory(String category) {
+  List<Product> getProductsByCategory(String category) {
     return allProducts.where((p) => p.category == category).toList();
   }
 
   /// Get favorite products
-  List<ProductModel> get favoriteProducts {
+  List<Product> get favoriteProducts {
     return allProducts.where((p) => p.isFavorite).toList();
   }
 }

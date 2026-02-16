@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../../data/models/product_model.dart';
+import '../../domain/entities/cart_item.dart';
 
 abstract class CartState extends Equatable {
   const CartState();
@@ -16,7 +16,7 @@ class CartLoading extends CartState {}
 
 /// Loaded state with cart items and totals
 class CartLoaded extends CartState {
-  final List<ProductModel> cartProducts;
+  final List<CartItemEntity> cartProducts;
   final double cartTotal;
   final int cartItemsCount;
 
@@ -33,7 +33,7 @@ class CartLoaded extends CartState {
   bool get isEmpty => cartProducts.isEmpty;
 
   /// Get product from cart by ID
-  ProductModel? getProductById(String productId) {
+  CartItemEntity? getProductById(String productId) {
     try {
       return cartProducts.firstWhere((p) => p.id == productId);
     } catch (e) {
