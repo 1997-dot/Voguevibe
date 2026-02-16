@@ -1,15 +1,25 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../data/repositories/product_repository.dart';
-import '../../../../data/managers/user_data_manager.dart';
+import '../../../../core/utils/result.dart';
+import '../../domain/repositories/favorites_repository.dart';
+import '../../domain/usecases/get_favorites_usecase.dart';
+import '../../domain/usecases/toggle_favorite_usecase.dart';
 import 'favorites_state.dart';
 
 class FavoritesCubit extends Cubit<FavoritesState> {
-  final ProductRepository _repository = ProductRepository();
-  final UserDataManager _userDataManager = UserDataManager();
+  final FavoritesFeatureRepository _favoritesRepository;
+  final GetFavoritesUseCase _getFavoritesUseCase;
+  final ToggleFavoriteUseCase _toggleFavoriteUseCase;
 
   String? _currentUserId;
 
-  FavoritesCubit() : super(FavoritesInitial());
+  FavoritesCubit({
+    required FavoritesFeatureRepository favoritesRepository,
+    required GetFavoritesUseCase getFavoritesUseCase,
+    required ToggleFavoriteUseCase toggleFavoriteUseCase,
+  })  : _favoritesRepository = favoritesRepository,
+        _getFavoritesUseCase = getFavoritesUseCase,
+        _toggleFavoriteUseCase = toggleFavoriteUseCase,
+        super(FavoritesInitial());
 
   /// Set current user and load favorites
   Future<void> setUser(String? userId) async {
@@ -26,20 +36,12 @@ class FavoritesCubit extends Cubit<FavoritesState> {
 
     emit(FavoritesLoading());
 
-    try {
-      // Load favorites from storage
-      final favorites = await _userDataManager.getUserFavorites(_currentUserId!);
-
-      // Update product models
-      for (var product in _repository.getAllProducts()) {
-        product.isFavorite = favorites.contains(product.id);
-      }
-
-      final favoriteProducts = _repository.getFavoriteProducts();
-
-      emit(FavoritesLoaded(favoriteProducts: favoriteProducts));
-    } catch (e) {
-      emit(FavoritesError('Failed to load favorites: ${e.toString()}'));
+    final result = await _getFavoritesUseCase(userId: _currentUserId!);
+    switch (result) {
+      case Success(data: final favorites):
+        emit(FavoritesLoaded(favoriteProducts: favorites));
+      case Failure(message: final msg):
+        emit(FavoritesError('Failed to load favorites: $msg'));
     }
   }
 
@@ -50,24 +52,20 @@ class FavoritesCubit extends Cubit<FavoritesState> {
       return;
     }
 
-    try {
-      // Toggle in repository
-      _repository.toggleFavorite(productId);
-
-      // Toggle in storage
-      await _userDataManager.toggleFavorite(_currentUserId!, productId);
-
-      // Reload favorites
-      await loadFavorites();
-    } catch (e) {
-      emit(FavoritesError('Failed to toggle favorite: ${e.toString()}'));
-      await loadFavorites(); // Reload to show current state
+    final result = await _toggleFavoriteUseCase(
+        userId: _currentUserId!, productId: productId);
+    switch (result) {
+      case Success():
+        await loadFavorites();
+      case Failure(message: final msg):
+        emit(FavoritesError('Failed to toggle favorite: $msg'));
+        await loadFavorites();
     }
   }
 
   /// Check if product is favorite
   bool isFavorite(String productId) {
-    final product = _repository.getProductById(productId);
+    final product = _favoritesRepository.getProductById(productId);
     return product?.isFavorite ?? false;
   }
 }

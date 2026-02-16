@@ -20,6 +20,10 @@ import '../features/cart/domain/usecases/add_to_cart_usecase.dart';
 import '../features/cart/domain/usecases/get_cart_usecase.dart';
 import '../features/cart/presentation/cubit/cart_cubit.dart';
 import '../features/checkout/presentation/cubit/checkout_cubit.dart';
+import '../features/favorites/data/repositories/favorites_repository_impl.dart';
+import '../features/favorites/data/sources/favorites_remote_source.dart';
+import '../features/favorites/domain/usecases/get_favorites_usecase.dart';
+import '../features/favorites/domain/usecases/toggle_favorite_usecase.dart';
 import '../features/favorites/presentation/cubit/favorites_cubit.dart';
 import '../features/home/data/repositories/home_repository_impl.dart';
 import '../features/home/data/sources/home_remote_source.dart';
@@ -114,7 +118,16 @@ class _VogueVibeAppState extends State<VogueVibeApp> {
             addToCartUseCase: AddToCartUseCase(cartRepo),
           );
         }),
-        BlocProvider(create: (_) => FavoritesCubit()),
+        BlocProvider(create: (_) {
+          final favoritesRepo = FavoritesRepositoryImpl(
+            dataSource: FavoritesDataSource(),
+          );
+          return FavoritesCubit(
+            favoritesRepository: favoritesRepo,
+            getFavoritesUseCase: GetFavoritesUseCase(favoritesRepo),
+            toggleFavoriteUseCase: ToggleFavoriteUseCase(favoritesRepo),
+          );
+        }),
         BlocProvider(create: (_) => CheckoutCubit()),
       ],
       child: MaterialApp(

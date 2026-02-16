@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../../data/models/product_model.dart';
+import '../../domain/entities/favorite_item.dart';
 
 abstract class FavoritesState extends Equatable {
   const FavoritesState();
@@ -16,7 +16,7 @@ class FavoritesLoading extends FavoritesState {}
 
 /// Loaded state with favorite products
 class FavoritesLoaded extends FavoritesState {
-  final List<ProductModel> favoriteProducts;
+  final List<FavoriteItemEntity> favoriteProducts;
 
   const FavoritesLoaded({required this.favoriteProducts});
 
@@ -27,7 +27,7 @@ class FavoritesLoaded extends FavoritesState {
   bool get isEmpty => favoriteProducts.isEmpty;
 
   /// Get favorite product by ID
-  ProductModel? getProductById(String productId) {
+  FavoriteItemEntity? getProductById(String productId) {
     try {
       return favoriteProducts.firstWhere((p) => p.id == productId);
     } catch (e) {
