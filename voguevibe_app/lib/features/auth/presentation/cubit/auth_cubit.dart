@@ -1,17 +1,35 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../data/models/user_model.dart';
-import '../../../../data/repositories/auth_repository.dart';
+import '../../../../core/utils/result.dart';
+import '../../domain/entities/user.dart';
+import '../../domain/repositories/auth_repository.dart';
+import '../../domain/usecases/login_usecase.dart';
+import '../../domain/usecases/register_usecase.dart';
+import '../../domain/usecases/logout_usecase.dart';
+import '../../domain/usecases/get_profile_usecase.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository _authRepository;
+  final LoginUseCase _loginUseCase;
+  final RegisterUseCase _registerUseCase;
+  final LogoutUseCase _logoutUseCase;
+  final GetProfileUseCase _getProfileUseCase;
 
-  AuthCubit({AuthRepository? authRepository})
-      : _authRepository = authRepository ?? AuthRepository(),
+  AuthCubit({
+    required AuthRepository authRepository,
+    required LoginUseCase loginUseCase,
+    required RegisterUseCase registerUseCase,
+    required LogoutUseCase logoutUseCase,
+    required GetProfileUseCase getProfileUseCase,
+  })  : _authRepository = authRepository,
+        _loginUseCase = loginUseCase,
+        _registerUseCase = registerUseCase,
+        _logoutUseCase = logoutUseCase,
+        _getProfileUseCase = getProfileUseCase,
         super(AuthInitial());
 
   /// Get current user from state
-  UserModel? get currentUser {
+  User? get currentUser {
     final currentState = state;
     if (currentState is AuthAuthenticated) {
       return currentState.user;
@@ -41,15 +59,16 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> initialize() async {
     emit(AuthLoading());
 
-    try {
-      final savedUser = await _authRepository.getSavedUser();
-      if (savedUser != null) {
-        emit(AuthAuthenticated(savedUser));
-      } else {
-        emit(AuthUnauthenticated());
-      }
-    } catch (e) {
-      emit(AuthError('Failed to load user data'));
+    final result = await _authRepository.getSavedUser();
+    switch (result) {
+      case Success(data: final savedUser):
+        if (savedUser != null) {
+          emit(AuthAuthenticated(savedUser));
+        } else {
+          emit(AuthUnauthenticated());
+        }
+      case Failure(message: final message):
+        emit(AuthError(message));
     }
   }
 
@@ -60,17 +79,14 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     emit(AuthLoading());
 
-    try {
-      final user = await _authRepository.login(
-        email: email,
-        password: password,
-      );
-      emit(AuthAuthenticated(user));
-      return true;
-    } catch (e) {
-      final errorMessage = e.toString().replaceAll('Exception: ', '');
-      emit(AuthError(errorMessage));
-      return false;
+    final result = await _loginUseCase(email: email, password: password);
+    switch (result) {
+      case Success(data: final user):
+        emit(AuthAuthenticated(user));
+        return true;
+      case Failure(message: final message):
+        emit(AuthError(message));
+        return false;
     }
   }
 
@@ -83,19 +99,19 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     emit(AuthLoading());
 
-    try {
-      final user = await _authRepository.register(
-        name: name,
-        email: email,
-        password: password,
-        phone: phone,
-      );
-      emit(AuthAuthenticated(user));
-      return true;
-    } catch (e) {
-      final errorMessage = e.toString().replaceAll('Exception: ', '');
-      emit(AuthError(errorMessage));
-      return false;
+    final result = await _registerUseCase(
+      name: name,
+      email: email,
+      password: password,
+      phone: phone,
+    );
+    switch (result) {
+      case Success(data: final user):
+        emit(AuthAuthenticated(user));
+        return true;
+      case Failure(message: final message):
+        emit(AuthError(message));
+        return false;
     }
   }
 
@@ -103,11 +119,12 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> logout() async {
     emit(AuthLoading());
 
-    try {
-      await _authRepository.logout();
-      emit(AuthUnauthenticated());
-    } catch (e) {
-      emit(AuthError('Failed to logout'));
+    final result = await _logoutUseCase();
+    switch (result) {
+      case Success():
+        emit(AuthUnauthenticated());
+      case Failure():
+        emit(AuthError('Failed to logout'));
     }
   }
 
@@ -115,16 +132,17 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> refreshProfile() async {
     if (currentUser == null) return;
 
-    try {
-      final updatedUser = await _authRepository.fetchProfile();
-      emit(AuthAuthenticated(updatedUser));
-    } catch (e) {
-      emit(AuthError('Failed to refresh profile'));
+    final result = await _getProfileUseCase();
+    switch (result) {
+      case Success(data: final updatedUser):
+        emit(AuthAuthenticated(updatedUser));
+      case Failure():
+        emit(AuthError('Failed to refresh profile'));
     }
   }
 
   /// Update user data locally
-  Future<void> updateUser(UserModel user) async {
+  Future<void> updateUser(User user) async {
     await _authRepository.updateUser(user);
     emit(AuthAuthenticated(user));
   }
@@ -138,6 +156,12 @@ class AuthCubit extends Cubit<AuthState> {
 
   /// Check if user is logged in
   Future<bool> checkAuthStatus() async {
-    return await _authRepository.isLoggedIn();
+    final result = await _authRepository.isLoggedIn();
+    switch (result) {
+      case Success(data: final isLoggedIn):
+        return isLoggedIn;
+      case Failure():
+        return false;
+    }
   }
 }

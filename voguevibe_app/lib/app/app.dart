@@ -4,6 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../core/constants/app_constants.dart';
 import '../core/navigation/app_navigator.dart';
 import '../core/navigation/app_route.dart';
+import '../features/auth/data/repositories/auth_repository_impl.dart';
+import '../features/auth/data/sources/auth_local_source.dart';
+import '../features/auth/data/sources/auth_remote_source.dart';
+import '../features/auth/domain/usecases/get_profile_usecase.dart';
+import '../features/auth/domain/usecases/login_usecase.dart';
+import '../features/auth/domain/usecases/logout_usecase.dart';
+import '../features/auth/domain/usecases/register_usecase.dart';
 import '../features/auth/presentation/cubit/auth_cubit.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
@@ -45,7 +52,19 @@ class _VogueVibeAppState extends State<VogueVibeApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => AuthCubit()),
+        BlocProvider(create: (_) {
+          final authRepo = AuthRepositoryImpl(
+            remoteSource: AuthRemoteSource(),
+            localSource: AuthLocalSource(),
+          );
+          return AuthCubit(
+            authRepository: authRepo,
+            loginUseCase: LoginUseCase(authRepo),
+            registerUseCase: RegisterUseCase(authRepo),
+            logoutUseCase: LogoutUseCase(authRepo),
+            getProfileUseCase: GetProfileUseCase(authRepo),
+          );
+        }),
         BlocProvider(create: (_) => HomeCubit()),
         BlocProvider(create: (_) => CartCubit()),
         BlocProvider(create: (_) => FavoritesCubit()),
