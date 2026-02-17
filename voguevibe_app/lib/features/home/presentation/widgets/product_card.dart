@@ -11,6 +11,7 @@ class ProductCardWidget extends StatefulWidget {
   final bool isFavorite;
   final VoidCallback onFavoriteToggle;
   final VoidCallback onAddTap;
+  final VoidCallback? onTap;
   final bool isAdded;
 
   const ProductCardWidget({
@@ -22,6 +23,7 @@ class ProductCardWidget extends StatefulWidget {
     required this.isFavorite,
     required this.onFavoriteToggle,
     required this.onAddTap,
+    this.onTap,
     this.isAdded = false,
   });
 
@@ -56,41 +58,44 @@ class _ProductCardWidgetState extends State<ProductCardWidget> {
     const double borderRadius = 20.0;
     const double spacing = 12.0;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(color: AppColors.carbonBlack, width: 1.5),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: Stack(
-          children: [
-            // Glassmorphism Background
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  color: AppColors.blackberryCream.withValues(alpha: 0.2),
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(borderRadius),
+          border: Border.all(color: AppColors.carbonBlack, width: 1.5),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: Stack(
+            children: [
+              // Glassmorphism Background
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    color: AppColors.blackberryCream.withValues(alpha: 0.2),
+                  ),
                 ),
               ),
-            ),
 
-            // Content Layout
-            Padding(
-              padding: const EdgeInsets.all(spacing),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildProductImage(borderRadius),
-                  const SizedBox(height: spacing),
-                  _buildProductName(),
-                  const Spacer(),
-                  _buildBottomRow(),
-                ],
+              // Content Layout
+              Padding(
+                padding: const EdgeInsets.all(spacing),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildProductImage(borderRadius),
+                    const SizedBox(height: spacing),
+                    _buildProductName(),
+                    const Spacer(),
+                    _buildBottomRow(),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

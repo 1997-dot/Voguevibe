@@ -14,10 +14,12 @@ import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../../../favorites/presentation/pages/favorites_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
+import '../../domain/entities/home_section.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 import '../widgets/category_selector.dart';
 import '../widgets/offer_widget.dart';
+import '../../../product/presentation/widgets/product_details_screen.dart';
 import '../widgets/product_card.dart';
 
 class HomePage extends StatefulWidget {
@@ -319,6 +321,7 @@ class _HomePageState extends State<HomePage> {
                   productPrice: '\$${product.price.toStringAsFixed(0)}',
                   isFavorite: product.isFavorite,
                   isAdded: product.isInCart,
+                  onTap: () => _showProductDetails(context, product),
                   onFavoriteToggle: () {
                     context.read<FavoritesCubit>().toggleFavorite(product.id);
                   },
@@ -373,6 +376,7 @@ class _HomePageState extends State<HomePage> {
                       productPrice: '\$${product.price.toStringAsFixed(0)}',
                       isFavorite: product.isFavorite,
                       isAdded: product.isInCart,
+                      onTap: () => _showProductDetails(context, product),
                       onFavoriteToggle: () {
                         context.read<FavoritesCubit>().toggleFavorite(product.id);
                       },
@@ -387,6 +391,24 @@ class _HomePageState extends State<HomePage> {
           },
         ),
       ],
+    );
+  }
+
+  void _showProductDetails(BuildContext context, Product product) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => ProductDetailsBottomSheet(
+        productId: product.id,
+        imageUrl: product.thumbnail,
+        productTitle: product.title,
+        price: product.price,
+        description: product.description,
+        specifications: product.specifications,
+        isFavorite: product.isFavorite,
+        isInCart: product.isInCart,
+      ),
     );
   }
 }
