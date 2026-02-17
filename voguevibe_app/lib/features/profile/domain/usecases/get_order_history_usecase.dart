@@ -7,7 +7,7 @@ class GetOrderHistoryUseCase {
 
   GetOrderHistoryUseCase(this.repository);
 
-  Future<Result<List<Order>>> call() async {
-    return await repository.getOrderHistory();
+  Future<Result<List<Order>>> call({required String userId}) async {
+    return await repository.getOrderHistory(userId);
   }
 }

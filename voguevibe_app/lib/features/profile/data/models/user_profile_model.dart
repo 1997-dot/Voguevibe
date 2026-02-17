@@ -1,3 +1,4 @@
+import '../../../auth/data/models/user_model.dart';
 import '../../domain/entities/user_profile.dart';
 
 class UserProfileModel extends UserProfile {
@@ -8,6 +9,17 @@ class UserProfileModel extends UserProfile {
     super.phone,
     super.address,
   });
+
+  /// Bridge from legacy AuthUserModel to profile domain entity.
+  factory UserProfileModel.fromLegacy(AuthUserModel user) {
+    return UserProfileModel(
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      address: user.address,
+    );
+  }
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
     return UserProfileModel(

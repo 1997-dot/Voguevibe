@@ -1,16 +1,21 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../data/repositories/product_repository.dart';
-import '../../../../data/managers/user_data_manager.dart';
-import '../../../../data/models/order_model.dart';
+import '../../../../core/utils/result.dart';
+import '../../domain/usecases/get_orders_usecase.dart';
+import '../../domain/usecases/place_order_usecase.dart';
 import 'checkout_state.dart';
 
 class CheckoutCubit extends Cubit<CheckoutState> {
-  final ProductRepository _repository = ProductRepository();
-  final UserDataManager _userDataManager = UserDataManager();
+  final PlaceOrderUseCase _placeOrderUseCase;
+  final GetOrdersUseCase _getOrdersUseCase;
 
   String? _currentUserId;
 
-  CheckoutCubit() : super(CheckoutInitial());
+  CheckoutCubit({
+    required PlaceOrderUseCase placeOrderUseCase,
+    required GetOrdersUseCase getOrdersUseCase,
+  })  : _placeOrderUseCase = placeOrderUseCase,
+        _getOrdersUseCase = getOrdersUseCase,
+        super(CheckoutInitial());
 
   /// Set current user
   void setUser(String? userId) {
@@ -29,32 +34,16 @@ class CheckoutCubit extends Cubit<CheckoutState> {
 
     emit(CheckoutLoading());
 
-    try {
-      // Get cart products
-      final cartProducts = _repository.getCartProducts();
-
-      if (cartProducts.isEmpty) {
-        emit(const CheckoutError('Cart is empty'));
-        return;
-      }
-
-      // Create order
-      final order = OrderModel.fromCartProducts(
-        cartProducts: cartProducts,
-        shippingAddress: shippingAddress,
-        paymentMethod: paymentMethod,
-      );
-
-      // Save order
-      await _userDataManager.addOrder(_currentUserId!, order);
-
-      // Clear cart
-      _repository.clearCart();
-      await _userDataManager.clearCart(_currentUserId!);
-
-      emit(CheckoutSuccess(order));
-    } catch (e) {
-      emit(CheckoutError('Failed to create order: ${e.toString()}'));
+    final result = await _placeOrderUseCase(
+      userId: _currentUserId!,
+      shippingAddress: shippingAddress,
+      paymentMethod: paymentMethod,
+    );
+    switch (result) {
+      case Success(data: final order):
+        emit(CheckoutSuccess(order));
+      case Failure(message: final msg):
+        emit(CheckoutError('Failed to create order: $msg'));
     }
   }
 
@@ -67,11 +56,13 @@ class CheckoutCubit extends Cubit<CheckoutState> {
 
     emit(CheckoutLoading());
 
-    try {
-      final orders = await _userDataManager.getUserOrders(_currentUserId!);
-      emit(OrdersLoaded(orders));
-    } catch (e) {
-      emit(CheckoutError('Failed to load orders: ${e.toString()}'));
+    final result =
+        await _getOrdersUseCase(userId: _currentUserId!);
+    switch (result) {
+      case Success(data: final orders):
+        emit(OrdersLoaded(orders));
+      case Failure(message: final msg):
+        emit(CheckoutError('Failed to load orders: $msg'));
     }
   }
 

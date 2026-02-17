@@ -1,34 +1,38 @@
-import '../../../../core/network/api_client.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../data/managers/user_data_manager.dart';
+import '../../../auth/data/sources/auth_local_source.dart';
 import '../models/order_model.dart';
 import '../models/user_profile_model.dart';
 
-class ProfileRemoteSource {
-  final ApiClient apiClient;
+/// Data source that bridges to legacy AuthLocalSource and UserDataManager,
+/// copying exact logic from the original ProfilePage's data access.
+class ProfileDataSource {
+  final AuthLocalSource _authLocalSource = AuthLocalSource();
+  final UserDataManager _userDataManager = UserDataManager();
 
-  ProfileRemoteSource(this.apiClient);
-
+  /// Get user profile from local auth storage.
   Future<Result<UserProfileModel>> getUserProfile() async {
-    return await apiClient.get(
-      '/profile',
-      fromJson: (json) => UserProfileModel.fromJson(json),
-    );
+    final result = await _authLocalSource.getSavedUser();
+    switch (result) {
+      case Success(data: final user):
+        if (user != null) {
+          return Success(UserProfileModel.fromLegacy(user));
+        }
+        return const Failure('No user found');
+      case Failure(message: final msg):
+        return Failure(msg);
+    }
   }
 
-  Future<Result<void>> updateProfile(UserProfileModel profile) async {
-    return await apiClient.put(
-      '/profile',
-      data: profile.toJson(),
-      fromJson: (_) {},
-    );
-  }
-
-  Future<Result<List<OrderModel>>> getOrderHistory() async {
-    return await apiClient.get(
-      '/profile/orders',
-      fromJson: (json) => (json as List)
-          .map((item) => OrderModel.fromJson(item))
-          .toList(),
-    );
+  /// Get user order history from UserDataManager.
+  Future<Result<List<OrderModel>>> getOrderHistory(String userId) async {
+    try {
+      final legacyOrders = await _userDataManager.getUserOrders(userId);
+      final orders =
+          legacyOrders.map((order) => OrderModel.fromLegacy(order)).toList();
+      return Success(orders);
+    } catch (e) {
+      return Failure(e.toString());
+    }
   }
 }

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../../data/models/order_model.dart';
+import '../../domain/entities/order.dart';
 
 abstract class CheckoutState extends Equatable {
   const CheckoutState();
@@ -16,7 +16,7 @@ class CheckoutLoading extends CheckoutState {}
 
 /// Order success state
 class CheckoutSuccess extends CheckoutState {
-  final OrderModel order;
+  final OrderEntity order;
 
   const CheckoutSuccess(this.order);
 
@@ -36,7 +36,7 @@ class CheckoutError extends CheckoutState {
 
 /// Orders loaded state (order history)
 class OrdersLoaded extends CheckoutState {
-  final List<OrderModel> orders;
+  final List<OrderEntity> orders;
 
   const OrdersLoaded(this.orders);
 
@@ -47,7 +47,7 @@ class OrdersLoaded extends CheckoutState {
   bool get isEmpty => orders.isEmpty;
 
   /// Get order by ID
-  OrderModel? getOrderById(String orderId) {
+  OrderEntity? getOrderById(String orderId) {
     try {
       return orders.firstWhere((o) => o.id == orderId);
     } catch (e) {

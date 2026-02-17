@@ -19,12 +19,21 @@ import '../features/cart/data/sources/cart_remote_source.dart';
 import '../features/cart/domain/usecases/add_to_cart_usecase.dart';
 import '../features/cart/domain/usecases/get_cart_usecase.dart';
 import '../features/cart/presentation/cubit/cart_cubit.dart';
+import '../features/checkout/data/repositories/checkout_repository_impl.dart';
+import '../features/checkout/data/sources/checkout_remote_source.dart';
+import '../features/checkout/domain/usecases/get_orders_usecase.dart';
+import '../features/checkout/domain/usecases/place_order_usecase.dart';
 import '../features/checkout/presentation/cubit/checkout_cubit.dart';
 import '../features/favorites/data/repositories/favorites_repository_impl.dart';
 import '../features/favorites/data/sources/favorites_remote_source.dart';
 import '../features/favorites/domain/usecases/get_favorites_usecase.dart';
 import '../features/favorites/domain/usecases/toggle_favorite_usecase.dart';
 import '../features/favorites/presentation/cubit/favorites_cubit.dart';
+import '../features/profile/data/repositories/profile_repository_impl.dart';
+import '../features/profile/data/sources/profile_remote_source.dart';
+import '../features/profile/domain/usecases/get_order_history_usecase.dart';
+import '../features/profile/domain/usecases/get_user_profile_usecase.dart';
+import '../features/profile/presentation/cubit/profile_cubit.dart';
 import '../features/home/data/repositories/home_repository_impl.dart';
 import '../features/home/data/sources/home_remote_source.dart';
 import '../features/home/domain/usecases/get_home_data_usecase.dart';
@@ -128,7 +137,24 @@ class _VogueVibeAppState extends State<VogueVibeApp> {
             toggleFavoriteUseCase: ToggleFavoriteUseCase(favoritesRepo),
           );
         }),
-        BlocProvider(create: (_) => CheckoutCubit()),
+        BlocProvider(create: (_) {
+          final checkoutRepo = CheckoutRepositoryImpl(
+            dataSource: CheckoutDataSource(),
+          );
+          return CheckoutCubit(
+            placeOrderUseCase: PlaceOrderUseCase(checkoutRepo),
+            getOrdersUseCase: GetOrdersUseCase(checkoutRepo),
+          );
+        }),
+        BlocProvider(create: (_) {
+          final profileRepo = ProfileRepositoryImpl(
+            dataSource: ProfileDataSource(),
+          );
+          return ProfileCubit(
+            getUserProfileUseCase: GetUserProfileUseCase(profileRepo),
+            getOrderHistoryUseCase: GetOrderHistoryUseCase(profileRepo),
+          );
+        }),
       ],
       child: MaterialApp(
         title: AppConstants.appName,
