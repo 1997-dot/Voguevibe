@@ -7,6 +7,7 @@ class FavoriteProductHighlightCard extends StatelessWidget {
   final String productName;
   final String productPrice;
   final String imageUrl;
+  final bool isInCart;
   final VoidCallback onButtonPressed;
   final VoidCallback onRemoveFromFavorites;
 
@@ -15,6 +16,7 @@ class FavoriteProductHighlightCard extends StatelessWidget {
     required this.productName,
     required this.productPrice,
     required this.imageUrl,
+    required this.isInCart,
     required this.onButtonPressed,
     required this.onRemoveFromFavorites,
   });
@@ -69,7 +71,7 @@ class FavoriteProductHighlightCard extends StatelessWidget {
                         children: [
                           // Custom Styled Button
                           _CustomActionButton(
-                            label: "Add to Cart",
+                            isInCart: isInCart,
                             onTap: onButtonPressed,
                           ),
                           const Spacer(),
@@ -118,11 +120,11 @@ class _ProductImage extends StatelessWidget {
 }
 
 class _CustomActionButton extends StatelessWidget {
-  final String label;
+  final bool isInCart;
   final VoidCallback onTap;
 
   const _CustomActionButton({
-    required this.label,
+    required this.isInCart,
     required this.onTap,
   });
 
@@ -130,27 +132,28 @@ class _CustomActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: AppColors.raspberryPlum,
+          color: isInCart ? AppColors.white : AppColors.raspberryPlum,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "Add to Cart",
+              isInCart ? "Added To Cart" : "Add to Cart",
               style: TextStyle(
-                color: AppColors.white,
+                color: isInCart ? AppColors.black : AppColors.white,
                 fontWeight: FontWeight.w600,
                 fontSize: 12,
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Icon(
-              Icons.shopping_cart_outlined,
-              color: AppColors.white,
+              isInCart ? Icons.check : Icons.shopping_cart_outlined,
+              color: isInCart ? AppColors.black : AppColors.white,
               size: 16,
             ),
           ],

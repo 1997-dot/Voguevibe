@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
+import '../../../cart/presentation/cubit/cart_state.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 
 class ProductDetailsBottomSheet extends StatelessWidget {
@@ -209,72 +210,86 @@ class ProductDetailsBottomSheet extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: AppColors.carbonBlack.withValues(alpha: 0.5),
-            width: 1,
+    return BlocBuilder<CartCubit, CartState>(
+      builder: (context, cartState) {
+        final inCart = context.read<CartCubit>().isInCart(productId);
+        return Container(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(
+                color: AppColors.carbonBlack.withValues(alpha: 0.5),
+                width: 1,
+              ),
+            ),
           ),
-        ),
-      ),
-      child: Row(
-        children: [
-          // Add to Cart button
-          Expanded(
-            child: SizedBox(
-              height: 50,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  context.read<CartCubit>().addToCart(productId);
-                  Navigator.pop(context);
-                },
-                icon: Icon(
-                  isInCart ? Icons.shopping_cart : Icons.add_shopping_cart,
-                  size: 20,
-                ),
-                label: Text(
-                  isInCart ? 'Added to Cart' : 'Add to Cart',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.raspberryPlum,
-                  foregroundColor: AppColors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+          child: Row(
+            children: [
+              // Add to Cart button
+              Expanded(
+                child: SizedBox(
+                  height: 50,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        final cartCubit = context.read<CartCubit>();
+                        if (inCart) {
+                          cartCubit.removeFromCart(productId);
+                        } else {
+                          cartCubit.addToCart(productId);
+                        }
+                      },
+                      icon: Icon(
+                        inCart ? Icons.check : Icons.add_shopping_cart,
+                        size: 20,
+                      ),
+                      label: Text(
+                        inCart ? 'Added To Cart' : 'Add to Cart',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            inCart ? AppColors.white : AppColors.raspberryPlum,
+                        foregroundColor:
+                            inCart ? AppColors.black : AppColors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Favorite button
-          SizedBox(
-            height: 50,
-            width: 50,
-            child: OutlinedButton(
-              onPressed: () {
-                context.read<FavoritesCubit>().toggleFavorite(productId);
-                Navigator.pop(context);
-              },
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(
-                    color: AppColors.raspberryPlum, width: 1.5),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              const SizedBox(width: 12),
+              // Favorite button
+              SizedBox(
+                height: 50,
+                width: 50,
+                child: OutlinedButton(
+                  onPressed: () {
+                    context.read<FavoritesCubit>().toggleFavorite(productId);
+                    Navigator.pop(context);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(
+                        color: AppColors.raspberryPlum, width: 1.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: EdgeInsets.zero,
+                  ),
+                  child: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: AppColors.raspberryPlum,
+                    size: 24,
+                  ),
                 ),
-                padding: EdgeInsets.zero,
               ),
-              child: Icon(
-                isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: AppColors.raspberryPlum,
-                size: 24,
-              ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/appbar.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
+import '../../../cart/presentation/cubit/cart_state.dart';
 import '../cubit/favorites_cubit.dart';
 import '../cubit/favorites_state.dart';
 import '../widgets/favorite_item_card.dart';
@@ -90,29 +91,42 @@ class _FavoritesPageState extends State<FavoritesPage> {
                     );
                   }
 
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
-                    ),
-                    itemCount: state.favoriteProducts.length,
-                    itemBuilder: (context, index) {
-                      final product = state.favoriteProducts[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: FavoriteProductHighlightCard(
-                          imageUrl: product.thumbnail,
-                          productName: product.title,
-                          productPrice: '\$${product.price.toStringAsFixed(0)}',
-                          onButtonPressed: () {
-                            context.read<CartCubit>().addToCart(product.id);
-                          },
-                          onRemoveFromFavorites: () {
-                            context
-                                .read<FavoritesCubit>()
-                                .toggleFavorite(product.id);
-                          },
+                  return BlocBuilder<CartCubit, CartState>(
+                    builder: (context, cartState) {
+                      return ListView.builder(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
                         ),
+                        itemCount: state.favoriteProducts.length,
+                        itemBuilder: (context, index) {
+                          final product = state.favoriteProducts[index];
+                          final isInCart =
+                              context.read<CartCubit>().isInCart(product.id);
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: FavoriteProductHighlightCard(
+                              imageUrl: product.thumbnail,
+                              productName: product.title,
+                              productPrice:
+                                  '\$${product.price.toStringAsFixed(0)}',
+                              isInCart: isInCart,
+                              onButtonPressed: () {
+                                final cartCubit = context.read<CartCubit>();
+                                if (isInCart) {
+                                  cartCubit.removeFromCart(product.id);
+                                } else {
+                                  cartCubit.addToCart(product.id);
+                                }
+                              },
+                              onRemoveFromFavorites: () {
+                                context
+                                    .read<FavoritesCubit>()
+                                    .toggleFavorite(product.id);
+                              },
+                            ),
+                          );
+                        },
                       );
                     },
                   );
