@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../../../cart/presentation/cubit/cart_state.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
+import '../../../favorites/presentation/cubit/favorites_state.dart';
 
 class ProductDetailsBottomSheet extends StatelessWidget {
   final String productId;
@@ -263,28 +264,35 @@ class ProductDetailsBottomSheet extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               // Favorite button
-              SizedBox(
-                height: 50,
-                width: 50,
-                child: OutlinedButton(
-                  onPressed: () {
-                    context.read<FavoritesCubit>().toggleFavorite(productId);
-                    Navigator.pop(context);
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(
-                        color: AppColors.raspberryPlum, width: 1.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              BlocBuilder<FavoritesCubit, FavoritesState>(
+                builder: (context, favState) {
+                  final isFav =
+                      context.read<FavoritesCubit>().isFavorite(productId);
+                  return SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        context
+                            .read<FavoritesCubit>()
+                            .toggleFavorite(productId);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(
+                            color: AppColors.raspberryPlum, width: 1.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: Icon(
+                        isFav ? Icons.favorite : Icons.favorite_border,
+                        color: AppColors.raspberryPlum,
+                        size: 24,
+                      ),
                     ),
-                    padding: EdgeInsets.zero,
-                  ),
-                  child: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: AppColors.raspberryPlum,
-                    size: 24,
-                  ),
-                ),
+                  );
+                },
               ),
             ],
           ),
