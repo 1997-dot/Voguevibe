@@ -83,13 +83,15 @@ class _VogueVibeAppState extends State<VogueVibeApp> {
             remoteSource: AuthRemoteSource(),
             localSource: AuthLocalSource(),
           );
-          return AuthCubit(
+          final cubit = AuthCubit(
             authRepository: authRepo,
             loginUseCase: LoginUseCase(authRepo),
             registerUseCase: RegisterUseCase(authRepo),
             logoutUseCase: LogoutUseCase(authRepo),
             getProfileUseCase: GetProfileUseCase(authRepo),
           );
+          cubit.initialize();
+          return cubit;
         }),
         BlocProvider(create: (_) {
           final homeRepo = HomeRepositoryImpl(

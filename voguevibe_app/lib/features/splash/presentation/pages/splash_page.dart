@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../auth/presentation/cubit/auth_state.dart';
 import '../../../auth/presentation/pages/login_page.dart';
+import '../../../home/presentation/pages/home_page.dart';
 
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
@@ -53,11 +57,26 @@ class SplashPage extends StatelessWidget {
                   text: 'Start Your Journey',
                   width: screenWidth * 0.7,
                   icon: Icons.arrow_forward,
-                  onPressed: () {
+                  onPressed: () async {
+                    final authCubit = context.read<AuthCubit>();
+
+                    // Wait for initialization if still loading
+                    if (authCubit.state is AuthLoading ||
+                        authCubit.state is AuthInitial) {
+                      await authCubit.stream.firstWhere(
+                        (state) =>
+                            state is! AuthLoading && state is! AuthInitial,
+                      );
+                    }
+
+                    if (!context.mounted) return;
+
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
+                        builder: (_) => authCubit.isAuthenticated
+                            ? const HomePage()
+                            : const LoginPage(),
                       ),
                     );
                   },

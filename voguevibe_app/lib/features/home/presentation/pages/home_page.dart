@@ -6,6 +6,7 @@ import '../../../../core/widgets/appbar.dart';
 import '../../../../core/widgets/bottom_navigation_bar.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
+import '../../../splash/presentation/pages/splash_page.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../../../cart/presentation/cubit/cart_state.dart';
 import '../../../cart/presentation/pages/cart_page.dart';
@@ -161,7 +162,13 @@ class _HomePageState extends State<HomePage> {
             icon: const Icon(Icons.logout),
             color: AppColors.white,
             onPressed: () {
-              // Handle logout
+              context.read<AuthCubit>().logout();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (_) => const SplashPage(),
+                ),
+                (route) => false,
+              );
             },
           ),
         ],
